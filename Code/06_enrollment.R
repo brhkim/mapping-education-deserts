@@ -42,6 +42,12 @@ ggplot(enrollment_scatter_data, aes(x=enrollment_value, y=desertprop*100, size=t
        title=paste0("Regional Enrollment Rates and Percent of Regional Population Living in Education Deserts"), subtitle=paste0("For ", schooltype))
 ggsave(file.path(project_output, paste0(countryname, '_enrollment_scatter.png')), width=10, height=6)
 
+# Check correlation between enrollment and proportion of population in a desert by region
+lmdata <- enrollment_scatter_data %>%
+  mutate(desertprop=desertprop*100)
+lm(formula=desertprop~enrollment_value, data=lmdata, weights=totalpop) %>% summary.lm()
+lm(formula=desertprop~enrollment_value, data=lmdata) %>% summary.lm()
+
 # Plot just the enrollment rates across regions on a map
 ggplot() + 
   theme_minimal() +
@@ -64,7 +70,7 @@ ggplot() +
   geom_sf(data=outline_3d, color=NA, fill="#1c1c1c") + 
   geom_sf(data=enrollment_scatter_data, aes(fill=enrollment_value), size=1, color="#1c1c1c") + 
   geom_sf(data=pop_desert_new2, aes(color=population, stroke=0), size=0.7, shape=15) + 
-  scale_fill_continuous(limits=c(50,100), breaks=c(50, 60, 70, 80, 90, 100)) + 
+  scale_fill_continuous(low="gray20", high="gray90", limits=c(50,100), breaks=c(50, 60, 70, 80, 90, 100)) + 
   scale_color_viridis_c(option="plasma", limits=c(1,500), oob=scales::squish, breaks=c(1, 100, 200, 300, 400, 500), labels=c("1", "100", "200", "300", "400", "500+")) + 
   theme(axis.title=element_blank(),
         axis.text=element_blank(),

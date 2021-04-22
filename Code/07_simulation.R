@@ -8,32 +8,42 @@
 #
 ################################################################################
 
-school_mapper <- function(desertdata, iterations) {
+check_adjacency <- function(desertdata) {
 
   # Initialize timer function
   start_time <- proc.time()
-  
+
   # Create an empty output dataframe
   adjacency_output <- data.frame(popid=as.numeric())
-  
+
   # Loop over each population point and calculate which other population cells are within the threshold distance of the given point
   for (i in 1:nrow(desertdata)) {
-    
+
     closepoints <- st_is_within_distance(desertdata[i,"geometry"], desertdata[,"geometry"], dist=distancethreshold*1000, sparse=TRUE)[[1]]
-    
-    loop_output <- data.frame(popid=desertdata[i,"popid"], adjacent=I(list(closepoints)))
-    
+
+    loop_output <- data.frame(popid=as.data.frame(desertdata[i,"popid"])["popid"], adjacent=I(list(closepoints)), check.names=FALSE, fix.empty.names=FALSE)
+
     # Append it to the output dataframe
     adjacency_output <- bind_rows(adjacency_output, loop_output)
-    
+
     if (i %% 1000 == 0) {
       print(paste("Finished with row", i, "of", nrow(desertdata), ". Cumulative Time taken:", round(((proc.time() - start_time)[3])/60, 3), "minutes", sep=" "))
     }
-
+    
   }
+  
+  # Provide the output
+  adjacency_output
+  
+}
+
+school_mapper <- function(desertdata, adjacency_output, iterations=100000, minreached=1) {
+  
+  start_time <- proc.time()
   
   # Merge the output from the loop (adjacency values) to main dataframe
   fulldata <- left_join(desertdata, adjacency_output, by="popid") 
+  
   cut_obs <- c()
 
   # Set up an output dataframe
@@ -55,6 +65,11 @@ school_mapper <- function(desertdata, iterations) {
     # Get the best school from this new set
     best_schools_plus <- subdata %>%
       slice_max(reduction, with_ties=FALSE)
+    
+    # Stop the loop if we go below the minimum number of population reached
+    if((best_schools_plus$reduction) < minreached) {
+      break
+    }
     
     # Add it to the output
     best_schools <- bind_rows(best_schools, best_schools_plus)
@@ -78,16 +93,25 @@ school_mapper <- function(desertdata, iterations) {
   
 }
 
+
 # If all you wanted to do is map out the location of X optimally located schools given the schools
 # and population for the most recent year of data, you would only need to run the following:
-  # school_mapper_output <- school_mapper(pop_desert_new2, X)
+  # adjacency_data <- check_adjacency(desertdata = pop_desert_new2)
+  # school_mapper_output <- school_mapper(desertdata = pop_desert_new2, adjacency_output = adjacency_data, iterations = X)
   # View(school_mapper_output[[1]])
 # where pop_desert_new2 is constructed from 06_enrollment.R.
 # and school_mapper_output[[1]] displays the location of the schools (coordinates stored as geometry)
 # and the estimated number of people reached (stored as reduction) within the distancethreshold you set in 00_main.R
-# Note that this script takes quite a while to run; for Guatemala, it took about 7 hours.
-
-
+# Note that these scripts take quite a while to run; for Guatemala, it took about 7 hours.
+# You can alternately opt to set a "minreached" argument instead of an iterations argument that stops mapping new 
+# schools once they cross below a set threshold of people served. 
+# For example, if all schools must have a catchment of at least 200 population, you'd run the following
+# with an arbitrarily large iterations value:
+  # adjacency_data <- check_adjacency(desertdata = pop_desert_new2)
+  # school_mapper_output <- school_mapper(desertdata = pop_desert_new2, adjacency_output = adjacency_data, minreached=200)
+  # View(school_mapper_output[[1]])
+# But note that by default, it will not try to make more than 100,000 schools (arbitrarily large number) unless iterations
+# is set.
 
 # The remainder of this script runs our simulation exercise on Guatemala as per the paper.
 
@@ -107,7 +131,8 @@ pop_desert_old2 <- closest_school(populationdata=country_pop_old, schooldata=unc
 
 # Get algorithm output based on old population distribution (given only those 
 # schools that did not close over time) and how many new schools were built since then
-school_mapper_output <- school_mapper(pop_desert_old2, new_school_count)
+adjacency_data <- check_adjacency(desertdata = pop_desert_old2)
+school_mapper_output <- school_mapper(desertdata = pop_desert_old2, adjacency_output = adjacency_data, iterations = new_school_count)
 
 # Generate a plot to show how many people, cumulatively, are reached per newly constructed school
 construction_table <- school_mapper_output[[1]] %>%

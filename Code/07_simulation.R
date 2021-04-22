@@ -21,7 +21,7 @@ check_adjacency <- function(desertdata) {
 
     closepoints <- st_is_within_distance(desertdata[i,"geometry"], desertdata[,"geometry"], dist=distancethreshold*1000, sparse=TRUE)[[1]]
 
-    loop_output <- data.frame(popid=as.data.frame(desertdata[i,"popid"])["popid"], adjacent=I(list(closepoints)), check.names=FALSE, fix.empty.names=FALSE)
+    loop_output <- data.frame(popid=as.data.frame(desertdata[i,"popid"])["popid"], adjacent=I(list(closepoints)))
 
     # Append it to the output dataframe
     adjacency_output <- bind_rows(adjacency_output, loop_output)

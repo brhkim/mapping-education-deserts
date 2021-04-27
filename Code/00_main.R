@@ -37,9 +37,9 @@ rm(list = ls())
 # Load required packages for the main analysis; you must install them each beforehand 
 # using install.packages("tidyverse") (as an example) prior to the sapply "require" 
 # call below
-libs <- c('tidyverse', 'sf', 'haven', 'raster', 'units', 'rgdal')
+libs <- c('tidyverse', 'sf', 'haven', 'raster', 'units', 'rgdal', 'lwgeom')
 sapply(libs, require, character.only = TRUE)
-# 'rgdal', 'plotly', 'RSQLite', 'lwgeom'
+# 'plotly', 'RSQLite'
 
 # The following packages are *only required* if you wish to run the #extscripts
 # that extend our main analysis.

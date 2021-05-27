@@ -12,10 +12,10 @@ We recommend reading the paper closely before attempting to apply these analytic
 
 To use this toolset, begin by downloading the files into a folder of your choice (alongside your chosen population and school location datasets; more info on obtaining these data can be found in the paper), and opening and editing `<Code/00_main.R>`. This main code file includes all necessary instructions, documentation, file dependency info, etc. to start. All file specifications, pathing, and analytic decisions are set there explicitly in the first half of the document, with instructions for completing each specification included. Note that all parameters and code are by default set to replicate our analysis as presented for public primary schooling in Guatemala; we have made explicit comments within each script about where code should be altered for your own purposes. 
 
-Because each context and data circumstance is different, you may find that this codebase does not exactly suit your needs. Each code file step (e.g., `<Code/01_import.R>`) also includes heavily documented code at each step and can be easily modified to accommodate differing file formats, variable names, and so on as needed. You may find the sf cheat sheet useful for any geospatial data transformations needed: https://github.com/rstudio/cheatsheets/blob/master/sf.pdf
+Because each context and data circumstance is different, you may find that this codebase does not exactly suit your needs (e.g., you run into data type errors, it doesn't quite provide output you wanted, etc.). Each individual code file (e.g., `<Code/01_import.R>`) also includes heavily documented code for each step and can be easily modified to accommodate differing file formats, variable names, and so on as needed. You may find the sf cheat sheet useful for any geospatial data transformations you require: https://github.com/rstudio/cheatsheets/blob/master/sf.pdf
 
-This is a multi-stage analysis that still requires some familiarity with R to use properly. That said, please don't hesitate to reach out to us with questions, concerns, or other inquiries! You can also feel free to write an issue or send a pull request to this repository as well. 
+That said, this is a multi-stage analysis that still requires some familiarity with R to use properly. Even so, please don't hesitate to reach out to us with questions, concerns, or other inquiries! You can also feel free to write an issue or send a pull request to this repository as well. We'd be happy to help how we can!
 
-Daniel Rodriguez-Segura (dan.rodriguez@virginia.edu)
+- Daniel Rodriguez-Segura (dan.rodriguez@virginia.edu)
 
-Brian Heseung Kim (brian.kim@virginia.edu)
+- Brian Heseung Kim (brian.kim@virginia.edu)
